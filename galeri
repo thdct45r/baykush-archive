@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>arşiv galerisi</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    #galeri { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; padding: 20px; }
+    #galeri img { width: 220px; height: 220px; object-fit: cover; border-radius: 8px; }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <h1 style="text-align:center;">30-40 arşivi</h1>
+  <div id="galeri">Yükleniyor...</div>
+
+  <script>
+    // admin.html'deki AYNI bilgileri buraya da yapıştır
+    const SUPABASE_URL = "https://fofckiktreldqxyyvksy.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvZmNraWt0cmVsZHF4eXl2a3N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxNTQ2NDIsImV4cCI6MjEwOTczMDY0Mn0.S3i1wdksji3r4K9-OuUvnq3AxVem4CamxnuM4fpAKNo";
+    const BUCKET = "photos";
+
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const galeri = document.getElementById('galeri');
+
+    async function goster() {
+      const { data, error } = await sb.storage.from(BUCKET).list();
+      if (error) {
+        galeri.innerText = 'Fotoğraflar yüklenirken hata oluştu: ' + error.message;
+        return;
+      }
+      if (!data || data.length === 0) {
+        galeri.innerText = 'Henüz fotoğraf yok.';
+        return;
+      }
+      galeri.innerHTML = '';
+      data.forEach(dosya => {
+        const { data: urlData } = sb.storage.from(BUCKET).getPublicUrl(dosya.name);
+        const img = document.createElement('img');
+        img.src = urlData.publicUrl;
+        galeri.appendChild(img);
+      });
+    }
+
+    goster();
+  </script>
+</body>
+</html>
