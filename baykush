@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>admin</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    #login-box, #upload-box { max-width: 320px; margin: 60px auto; text-align: center; }
+    input, button { padding: 10px; margin: 6px 0; width: 100%; box-sizing: border-box; }
+    #status { color: #666; font-size: 14px; margin-top: 8px; }
+    #photo-list { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 30px; }
+    #photo-list img { width: 120px; height: 120px; object-fit: cover; border-radius: 6px; }
+    .photo-item { position: relative; }
+    .photo-item button { width: auto; padding: 4px 8px; font-size: 12px; margin-top: 4px; }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <h1>admin panel</h1>
+
+  <div id="login-box">
+    <input type="email" id="email" placeholder="e-posta">
+    <input type="password" id="password" placeholder="şifre">
+    <button onclick="girisYap()">Giriş yap</button>
+    <div id="status"></div>
+  </div>
+
+  <div id="upload-box" style="display:none;">
+    <p>Giriş yapıldı ✅ <button onclick="cikisYap()" style="width:auto;">Çıkış</button></p>
+    <input type="file" id="fotoInput" accept="image/*">
+    <button onclick="fotoYukle()">Fotoğraf yükle</button>
+    <div id="uploadStatus"></div>
+    <div id="photo-list"></div>
+  </div>
+
+  <script>
+    // BURAYA Supabase Project Settings > API sayfasından aldığın bilgileri yapıştır
+    const SUPABASE_URL = "https://fofckiktreldqxyyvksy.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvZmNraWt0cmVsZHF4eXl2a3N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxNTQ2NDIsImV4cCI6MjEwOTczMDY0Mn0.S3i1wdksji3r4K9-OuUvnq3AxVem4CamxnuM4fpAKNo";
+    const BUCKET = "photos"; // Storage'da oluşturduğun bucket adı
+
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Giriş durumu değiştikçe ekranı güncelle
+    sb.auth.onAuthStateChange((_event, session) => {
+      const girisYapilmis = !!session;
+      document.getElementById('login-box').style.display = girisYapilmis ? 'none' : 'block';
+      document.getElementById('upload-box').style.display = girisYapilmis ? 'block' : 'none';
+      if (girisYapilmis) fotoListesiniYukle();
+    });
+
+    async function girisYap() {
+      const email = document.getElementById('email').value;
+      const sifre = document.getElementById('password').value;
+      const { error } = await sb.auth.signInWithPassword({ email, password: sifre });
+      if (error) document.getElementById('status').innerText = 'Hata: ' + error.message;
+    }
+
+    async function cikisYap() {
+      await sb.auth.signOut();
+    }
+
+    async function fotoYukle() {
+      const dosya = document.getElementById('fotoInput').files[0];
+      if (!dosya) { document.getElementById('uploadStatus').innerText = 'Önce bir dosya seç.'; return; }
+
+      const yol = Date.now() + '_' + dosya.name;
+      document.getElementById('uploadStatus').innerText = 'Yükleniyor...';
+
+      const { error } = await sb.storage.from(BUCKET).upload(yol, dosya);
+      if (error) {
+        document.getElementById('uploadStatus').innerText = 'Hata: ' + error.message;
+      } else {
+        document.getElementById('uploadStatus').innerText = 'Yüklendi ✅';
+        document.getElementById('fotoInput').value = '';
+        fotoListesiniYukle();
+      }
+    }
+
+    async function fotoListesiniYukle() {
+      const liste = document.getElementById('photo-list');
+      liste.innerHTML = '';
+      const { data, error } = await sb.storage.from(BUCKET).list();
+      if (error || !data) return;
+
+      data.forEach(dosya => {
+        const { data: urlData } = sb.storage.from(BUCKET).getPublicUrl(dosya.name);
+        const div = document.createElement('div');
+        div.className = 'photo-item';
+        div.innerHTML = `<img src="${urlData.publicUrl}"><br>
+          <button onclick="fotoSil('${dosya.name}')">Sil</button>`;
+        liste.appendChild(div);
+      });
+    }
+
+    async function fotoSil(ad) {
+      await sb.storage.from(BUCKET).remove([ad]);
+      fotoListesiniYukle();
+    }
+  </script>
+</body>
+</html>
