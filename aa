@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>arşiv</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>30-40 arşivi</h1>
+  <button onclick="window.location.href='galeri.html'">Fotoğrafları gör</button>
+</body>
+</html>
