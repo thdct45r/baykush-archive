@@ -1,0 +1,191 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap');
+
+:root {
+  --night: #1c2140;   /* sayfa zemini: gece indigosu */
+  --panel: #262c52;   /* kutular */
+  --line:  #3a4172;   /* ince çizgiler */
+  --text:  #ecebf5;   /* ana yazı */
+  --muted: #a3a7c9;   /* ikincil yazı */
+  --amber: #f2b441;   /* baykuş gözü: tek vurgu rengi */
+  --amber-hover: #ffc968;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--night);
+  color: var(--text);
+  font-family: 'Bricolage Grotesque', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ---------- Başlıklar ---------- */
+body h1 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  text-align: center;
+  font-size: clamp(1.9rem, 5vw, 2.7rem);
+  margin: 1.6rem 1rem 0.6rem;
+}
+
+/* ---------- Butonlar ---------- */
+body button,
+.btn {
+  font: inherit;
+  font-weight: 600;
+  background: var(--amber);
+  color: var(--night);
+  border: 0;
+  border-radius: 999px;
+  padding: 0.8rem 1.6rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+body button:hover,
+.btn:hover { background: var(--amber-hover); }
+
+:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 3px;
+}
+
+/* ---------- Ana sayfa ---------- */
+body.home {
+  display: grid;
+  place-items: center;
+}
+.hero {
+  text-align: center;
+  padding: 2rem 1.25rem;
+}
+body.home h1 {
+  font-size: clamp(2.6rem, 9vw, 4.8rem);
+  margin: 0 0 0.5rem;
+}
+.hero p {
+  color: var(--muted);
+  margin: 0 0 2.2rem;
+  font-size: 1.1rem;
+}
+.eyes {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-bottom: 1.8rem;
+}
+.eyes span {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--amber);
+  position: relative;
+  animation: blink 0.5s ease 1.2s 1;
+}
+.eyes span::after {
+  content: "";
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--night);
+  top: 19px;
+  left: 19px;
+}
+@keyframes blink {
+  0%, 100% { transform: scaleY(1); }
+  50%      { transform: scaleY(0.08); }
+}
+
+/* ---------- Galeri ---------- */
+.geri {
+  display: inline-block;
+  margin: 1.25rem 0 0 1.5rem;
+  color: var(--muted);
+  text-decoration: none;
+}
+.geri:hover { color: var(--amber); }
+
+body #galeri {
+  display: block;
+  columns: 240px;
+  column-gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+  color: var(--muted);
+}
+body #galeri img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 0 16px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  break-inside: avoid;
+}
+
+/* ---------- Admin ---------- */
+body #login-box,
+body #upload-box {
+  max-width: 380px;
+  margin: 1.5rem auto 3rem;
+  padding: 1.5rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+body #upload-box { max-width: 720px; }
+
+body input {
+  font: inherit;
+  background: var(--night);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.7rem 0.8rem;
+}
+body input::placeholder { color: var(--muted); }
+body input[type="file"]::file-selector-button {
+  font: inherit;
+  background: var(--line);
+  color: var(--text);
+  border: 0;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  margin-right: 0.8rem;
+  cursor: pointer;
+}
+
+body #status,
+body #uploadStatus { color: var(--muted); }
+
+body #photo-list { gap: 12px; }
+body #photo-list img {
+  border: 1px solid var(--line);
+}
+body .photo-item { text-align: center; }
+body .photo-item button {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 14px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 6px;
+}
+body .photo-item button:hover {
+  background: transparent;
+  color: var(--amber);
+  border-color: var(--amber);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eyes span { animation: none; }
+}
